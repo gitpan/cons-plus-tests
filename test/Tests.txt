@@ -477,7 +477,11 @@ t/t0053.t		ConsPath
 
 t/t0054.t		SplitPath
 
-	PLACEHOLDER.  TEST TO BE WRITTEN.
+	Create a Construct file in a subdirectory.  The Construct file
+	prints to an output file the result of several SplitPath calls,
+	covering the current directory, a subdirectory, an absolute
+	path to a directory outside the current tree, and an absolute
+	path to a subdirectory within the tree.  Check the output file.
 
 t/t0055.t		@ suppression
 

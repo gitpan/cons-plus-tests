@@ -1,5 +1,5 @@
 Cons regression tests to-do list
-$Id: TODO,v 1.1 2000/06/01 22:05:12 knight Exp $
+$Id: TODO,v 1.2 2000/06/12 11:01:07 knight Exp $
 
 Things that it would be good to have fixed, some day:
 
@@ -14,4 +14,3 @@ Things that it would be good to have fixed, some day:
 
 		t/t0052.t	SourcePath
 		t/t0053.t	ConsPath
-		t/t0054.t	SplitPath

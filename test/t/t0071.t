@@ -12,7 +12,7 @@
 #	last included file; run Cons; look for proper output.
 #
 
-# $Id: t0071.t,v 1.3 2000/06/01 22:00:45 knight Exp $
+# $Id: t0071.t,v 1.4 2000/06/10 04:09:21 knight Exp $
 
 # Copyright (c) 1996-2000 Free Software Foundation, Inc.
 #
@@ -48,14 +48,14 @@ use File::Spec;
 
 while (\@ARGV) {
 	\$arg = shift \@ARGV;
-	if (\$arg eq '-I') {
-		push \@dirs, shift \@ARGV;
+	if (\$arg =~ s/^-I//) {
+		\$arg = shift \@ARGV if ! \$arg;
+		push \@dirs, \$arg;
 	} else {
+		unshift \@ARGV, \$arg;
 		last;
 	}
 }
-
-my \$pat = \$arg;
 
 push \@dirs, '.';
 
@@ -67,8 +67,12 @@ sub file {
 		last if open(FILE, File::Spec->catfile(\$dir, \$file));
 	}
 	while (<FILE>) {
-		if (/\$pat\\s+(\\S+)/) {
-			file(\$1);
+		if (s/^\\s*include\\s+//) {
+			my \@files = split /\\s+/;
+			my \$f;
+			foreach \$f (\@files) {
+				file(\$f);
+			}
 		}
 		print;
 	}
@@ -84,68 +88,73 @@ _EOF_
 #
 $test->write('Construct', <<_EOF_);
 \$env = new cons ( ${\$test->cons_env} );
-QuickScan \$env sub {return \$1 if /fooinclude\\s+(\\S+)/}, 'foo.in';
+QuickScan \$env sub {return \$1 if /include\\s+(\\S+)/}, 'foo.in';
 Command \$env 'foo', 'foo.in', qq(
-	\Q$^X\E build.pl fooinclude %< > %>
+	\Q$^X\E build.pl %< > %>
 );
-sub myscan { return \$1 if /barinclude\\s+(\\S+)/ }
+sub myscan { /\\b\\S*?\\.in\\b/g }
 \$env->QuickScan(\\\&myscan, 'bar.in', 'one:two');
-\$env->QuickScan(\\\&myscan, 'one/ggg', 'one:two');
+\$env->QuickScan(\\\&myscan, 'one/ggg.in', 'one:two');
 Command \$env 'bar', 'bar.in', qq(
-	\Q$^X\E build.pl -I one -I two barinclude %< > %>
+	\Q$^X\E build.pl -I one -I two %< > %>
 );
 _EOF_
 
 $test->write('foo.in', <<_EOF_);
-foo.in 1
-fooinclude fff
-foo.in 3
+foo 1
+include fff.in
+foo 3
 _EOF_
 
 $test->write('bar.in', <<_EOF_);
-barinclude fff
-bar.in 2
-barinclude ggg
+include fff.in
+bar 2
+include ggg.in iii.in
 _EOF_
 
 #
-$test->write('fff', <<_EOF_);
+$test->write('fff.in', <<_EOF_);
 fff 1
 fff 2
 _EOF_
 
-$test->write(['one', 'ggg'], <<_EOF_);
+$test->write(['one', 'ggg.in'], <<_EOF_);
 one/ggg 1
-barinclude hhh
+include hhh.in
 _EOF_
 
-$test->write(['two', 'hhh'], <<_EOF_);
+$test->write(['two', 'hhh.in'], <<_EOF_);
 two/hhh 1
 two/hhh 2
 two/hhh 3
+_EOF_
+
+$test->write('iii.in', <<_EOF_);
+iii 1
 _EOF_
 
 $test->run(targets => ".");
 
 $test->file_matches('foo', <<_EOF_);
-foo.in 1
+foo 1
 fff 1
 fff 2
-foo.in 3
+foo 3
 _EOF_
 
 $test->file_matches('bar', <<_EOF_);
 fff 1
 fff 2
-bar.in 2
+bar 2
 one/ggg 1
 two/hhh 1
 two/hhh 2
 two/hhh 3
+iii 1
 _EOF_
 
 #
-$test->write('fff', <<_EOF_);
+$test->write('fff.in', <<_EOF_);
 fff X
 fff Y
 fff Z
@@ -154,73 +163,76 @@ _EOF_
 $test->run(targets => ".");
 
 $test->file_matches('foo', <<_EOF_);
-foo.in 1
+foo 1
 fff X
 fff Y
 fff Z
-foo.in 3
+foo 3
 _EOF_
 
 $test->file_matches('bar', <<_EOF_);
 fff X
 fff Y
 fff Z
-bar.in 2
+bar 2
 one/ggg 1
 two/hhh 1
 two/hhh 2
 two/hhh 3
+iii 1
 _EOF_
 
 #
-$test->write(['one', 'ggg'], <<_EOF_);
+$test->write(['one', 'ggg.in'], <<_EOF_);
 one/ggg !
-barinclude hhh
+include hhh.in
 _EOF_
 
 $test->run(targets => ".");
 
 $test->file_matches('foo', <<_EOF_);
-foo.in 1
+foo 1
 fff X
 fff Y
 fff Z
-foo.in 3
+foo 3
 _EOF_
 
 $test->file_matches('bar', <<_EOF_);
 fff X
 fff Y
 fff Z
-bar.in 2
+bar 2
 one/ggg !
 two/hhh 1
 two/hhh 2
 two/hhh 3
+iii 1
 _EOF_
 
 #
-$test->write(['two', 'hhh'], <<_EOF_);
+$test->write(['two', 'hhh.in'], <<_EOF_);
 two/hhh A
 _EOF_
 
 $test->run(targets => ".");
 
 $test->file_matches('foo', <<_EOF_);
-foo.in 1
+foo 1
 fff X
 fff Y
 fff Z
-foo.in 3
+foo 3
 _EOF_
 
 $test->file_matches('bar', <<_EOF_);
 fff X
 fff Y
 fff Z
-bar.in 2
+bar 2
 one/ggg !
 two/hhh A
+iii 1
 _EOF_
 
 #

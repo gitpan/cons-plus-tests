@@ -1,6 +1,14 @@
 Cons regression test suite changes
 
-$Id: CHANGES,v 1.1 2000/06/01 22:04:42 knight Exp $
+$Id: CHANGES,v 1.2 2000/06/12 11:01:07 knight Exp $
+
+
+
+Changes in cons release 2.x:
+
+	Write a real test for the following placeholder:
+		t/t0054.t		SplitPath
+	
 
 
 
