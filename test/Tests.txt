@@ -1,0 +1,1224 @@
+# Tests.txt
+
+This file documents the functionality tested by each test in the cons
+regression test suite, and how that functionality is tested.
+
+t/t0001.t		single-module Program
+
+	Compile a single executable from a single .c file in the
+	local directory.
+
+t/t0002.t		multiple-module Program
+
+	Compile a single executable from three .c files in the
+	local directory.
+
+t/t0003.t		selective module update
+
+	Compile a single executable from three .c files in the
+	local directory.  Update one of the files and re-compile.
+
+t/t0004.t		Build
+
+	Compile a single executable from three .c files in a
+	subdirectory with a Conscript file, invoked by
+	'Build' in the local-directory Construct file.
+
+t/t0005.t		top-level (#) path name
+
+	Compile a single executable in a subdirectory from three
+	.c files, two in the subdirectory and one in a separate
+	subdirectory.   The .c file in the separate subdirectory
+	is specified with an initial '#' path name.
+
+t/t0006.t		absolute (/) path name
+
+	Compile a single executable in a subdirectory from three
+	.c files, two in the subdirectory and one in a separate
+	subdirectory.   The .c file in the separate subdirectory
+	is specified with an absolute (initial '/') path name.
+
+t/t0007.t		Export / Import
+
+	Compile a single executable in a subdirectory from two .c
+	files.  One .c file contains an #ifdef.  The #ifdef is
+	defined in CFLAGS in the environment set up by the
+	top-level Construct file, and exported to the subsidiary
+	Conscript file.
+
+t/t0008.t		$ARG{}
+
+	Compile a single executable in a subdirectory from two .c
+	files.  The executable prints a string supplied (through
+	a #define) by a STRING= argument to the invoking cons
+	command line.
+
+t/t0009.t		Library
+
+	Build a library from two modules in the local directory.
+	Link it to another module in the local directory to
+	generate an executable.
+
+t/t0010.t		Library with selective module update
+
+	Build a library from two modules in the local directory.
+	Link it to another module in the local directory to
+	generate an executable.  Selectively update one of the
+	library modules, and re-link the executable.
+
+t/t0011.t		Install
+
+	Install a file from one subdirectory to another.
+
+t/t0012.t		single-module #include "..."
+
+	Compile a single executable from a single .c file in the
+	local directory, which includes a single .h file from the
+	local directory.   The #include file name is specified with
+	double-quotes.
+
+t/t0013.t		#include <...>, CPPPATH
+
+	Compile a single executable from a single .c file in the
+	local directory, which includes a single .h file from a
+	subdirectory.  The #include file name is specified angle
+	brackets, and CPPPATH is set to refer to the subdirectory.
+
+t/t0014.t		CPPPATH
+
+	Compile a single executable from a single .c file in the
+	local directory, which includes a single .h file from one
+	of two subdirectories.  Both subdirectories have the
+	same-named .h file.  Compile the executable twice, once
+	with the one subdirectory first in CPPPATH, then with the
+	other subdirectory first.
+
+	NOTE:  This test uses array-reference syntax for specifying
+	CPPPATH, as this is portable to Windows NT.  It does not
+	test the UNIX-specific method of using ':' to separate
+	directories listed in CPPPATH.
+
+t/t0015.t		nested #include <...>
+
+	Compile a single executable from a single .c file in the
+	local directory.  The .c file includes a single .h file
+	from a subdirectory, which in turn includes another .h file
+	from that subdirectory.  Update the second .h file and
+	re-compile.
+
+t/t0016.t		selective #include <...> update
+
+	Compile a single executable from four .c files in the local
+	directory.  Each .c file includes one of two .h files from
+	a subdirectory.  Update one of the two .h files and re-compile
+	to make sure the right .o files get re-generated.
+
+t/t0017.t		Link
+
+	Compile a single executable from three .c files in a
+	subdirectory.   Compilation takes place in a separate build
+	subdirectory established via the 'Link' command.
+
+t/t0018.t		single-environment variant builds
+
+	Compile a single executable from three .c files in a source
+	subdirectory.  One module has a conditional #include for
+	the selected OS.  Compilation takes place in two separate
+	build subdirectories established via the 'Link' command in
+	two separate invocations of cons.  The appropriate build
+	directory is specified via "OS=" on the cons command line.
+
+t/t0019.t		multiple-environment variant builds
+
+	Compile a single executable from three .c files in a source
+	subdirectory.  One .c file has a conditional #include for
+	the selected OS.  Compilation takes place in two separate
+	build subdirectories with separate Conscript files that
+	establish 'Link' to the source subdirectory and separate
+	build environments.  Both Conscript builds are invoked from
+	the same invocation of Cons.
+
+t/t0020.t		selective targeting
+
+	Compile three separate executables from separate .c files
+	in the local directory, and two separate executables from
+	separate .c files in a subdirectory.  Invoke cons with no
+	arguments and make sure nothing gets built.  Supply one of
+	the local executables as an argument and make sure only it
+	gets built.  Supply one of the local executables and the
+	subdirectory as arguments and make sure only those executables
+	get built.  Supply '.' as an argument and make sure the
+	last local executable gets built.
+
+t/t0021.t		Default
+
+	Define three executables to be compiled from separate .c files
+	in the local directory, and three in a subdirectory.  Specify
+	'Default' target of one of the executables in each directory.
+	Invoke cons with no arguments.  Make sure only the default
+	executables get built.  Invoke cons with '.' as argument.
+	Make sure the rest of the executables get built.
+
+t/t0022.t		build pruning
+
+	Define two separate executables to be compiled from single
+	.c files via separate Conscript files in separate
+	subdirectories.  Prune the build to one of the subdirectories
+	('+subdir') and make sure only the executable in that
+	subdirectory gets built.  Invoke cons with '.' as an
+	argument.  Make sure the other subdirectory's executable
+	got built, too.
+
+t/t0023.t		-o overrides
+
+	Define an executable to be built from a single .c file in the
+	local directory.  The .c files prints a single string to be
+	supplied via '-DSTRING=' from CFLAGS in the build environment.
+	Create two override files that change CFLAGS when generating the
+	.o file.  Invoke cons; make sure the executable is built with
+	the default STRING value.  Invoke cons with the firts override
+	file (-o over1); make sure the executable is built with the
+	first overridden STRING value.	Invoke cons with the second
+	override file (-oover2); make sure the executable is build
+	with the second overriddent STRING value.  Invoke cons again,
+	without the override; make sure the executable has reverted to
+	the original STRING value.
+
+t/t0024.t		clone
+
+	Define two executables to be built from duplicate .c files.
+	Define a built environment with CFLAGS dependent on %COPT.
+	Clone the environment, changing only %COPT.  Built one
+	executable with one environment and the other with the
+	other, making sure that each executable used the correct
+	%COPT value for its environment.
+
+t/t0025.t		Command
+
+	Specify a 'Command' that executes two a command-list to
+	"build" (in this case, pseudo-install) a file in the local
+	directory.
+
+t/t0026.t		Ignore
+
+	Compile an executable from a single .c file in the local
+	directory.  The .c file includes one local .h file
+	(double-quote #include) and one subdirectory .h file
+	(angle-bracke #include).  Specify "Ignore '^subdirectory/"
+	in the Construct file.  Build the executable by invoking
+	cons.  Update the subdirectory's .h files and invoke cons
+	again; check that it ignored the update .h file and did
+	NOT rebuild the executable.  Update the local .h file and
+	invoke cons again; check that it rebuilt the executable,
+	picking up the changes to both .h files.
+
+t/t0027.t		Depends
+
+	Compile an executable from a single .c file in the local
+	directory.  The .c file includes on local .h file.  The .h
+	file is ignored.  Use 'Depends' to establish a separate
+	dependency on a completely unrelated file.  Invoke cons to
+	build the executable.  Update the ignored local .h file
+	and build again, checking that it the executable did not
+	get re-built.  Update the unrelated file with the explicitly
+	specified dependency and build again, checking that the
+	executable now gets re-built with the updated .h file.
+
+t/t0028.t		-f dir/Construct
+
+	Create a subdirectory with three .c files and Construct
+	file.  Create decoy .c files in the current directory.
+	Invoke cons -f subdir/Construct.  Check that it built
+	correctly in the subdirectory and didn't pick up any decoy
+	of the .c files.  Invoke cons -fsubdir/Construct again.
+	Check that nothing was rebuilt.
+
+t/t0029.t		-r
+
+	Create two executables from .c files in the local directory,
+	and two in a subdirectory.  Remove one of the local
+	executables and .o files using -r; check that it worked
+	correctly.  Remove the executables and .o files from the
+	subdirectory using -r; check that it worked correctly.
+	Rebuild the world.  Remove the world using -r; check that
+	it worked correctly.
+
+t/t0030.t		-k
+
+	Create two executables from .c files in the local directory,
+	and two in a subdirectory.  Remove all derived files (-r).
+	Remove the first subdirectory .c file.  Build the subdirectory;
+	see it fail; make sure neither .o or executable was built.
+	Remove the first local directory .c file.  Build the world.
+	Make sure no .o files nor executables were built.  Build
+	-k the subdirectory.  Make sure the second "masked"
+	subdirectory executable was built.    Build -k the world.
+	Make sure the second "masked" local directory executable
+	was built.
+
+t/t0031.t		-p
+
+	Create Construct and Conscript files for creating four
+	executables, two from .c files in the local directory and
+	two from .c files in a subdirectory.  Invoke cons -p,
+	compare the output against expected results.
+
+t/t0032.t		-pa
+
+	Create Construct and Conscript files for creating four
+	executables, two from .c files in the local directory and
+	two from .c files in a subdirectory.  Invoke cons -pa,
+	compare the output against expected results.
+
+	NOTE:  THIS TEST EXAMINES THE ACTIONS USED TO BUILD FILES.
+
+t/t0033.t		-pw
+
+	Create Construct and two Conscript files for creating four
+	executables, two from .c files in the local directory and
+	two from .c files in a subdirectory.  Invoke cons -pw,
+	compare the output against expected results.
+
+t/t0034.t		-d
+
+	Create Construct and Conscript files for creating four
+	executables, two from .c files in the local directory and
+	two from .c files in a subdirectory.  Invoke cons -d.
+	Compare the output against expected results.
+
+	NOTE:  THIS TEST EXAMINES THE ACTIONS USED TO BUILD FILES.
+
+t/t0035.t		-wf file
+
+	Create Construct and Conscript files for creating four
+	executables, two from .c files in the local directory and
+	two from .c files in a subdirectory.  Invoke cons -wf file.
+	Compare the -wf output against expected results.  Make sure
+	the executables were generated correctly.
+
+t/t0036.t		%-variables
+
+	Use perl to print all combinations of %[<>0-9](:[df]?)?
+	variables into various files.
+
+t/t0037.t		-h, Help
+
+	Define a Construct file to compile a single executable from
+	a single .c file in the	local directory, with Help text
+	defined.  Check that the help text is generated by -h.
+	Check that the Program builds successfully without -h.
+
+t/t0038.t		Salt
+
+	Compile a single executable from three .c files in the
+	local directory.  Execute cons again, making sure
+	nothing was recompiled.  Execute cons again with a
+	Construct file containing a Salt for the signature;
+	make sure everything recompiled.  Execute again with the
+	normal Construct file; make sure everything recompiled.
+
+	NOTE:  THIS TEST EXAMINES THE ACTIONS USED TO BUILD FILES.
+
+t/t0039.t		UseCache
+
+	Compile a single executable from three .c files in a
+	subdirectory with UseCache.  Execute cons again, making
+	sure nothing was recompiled.  Execute cons -r to remove
+	generated files from the subdirectory.  Execute cons again,
+	checking the output to make sure that the generated files
+	were retrieved from the cache.
+
+t/t0040.t		UseCache, selective update
+
+	Compile a single executable from three .c files in a
+	subdirectory with UseCache.	Execute cons again,
+	making sure nothing was recompiled.  Execute cons -r to
+	remove generated files from the subdirectory.  Update
+	one of the source files.  Execute cons again, checking
+	the output to make sure that generated files for the
+	non-updated dependencies were retrieved from the cache.
+
+	NOTE:  THIS TEST EXAMINES THE ACTIONS USED TO BUILD FILES.
+
+t/t0041.t		UseCache, -cc
+
+	Compile a single executable from three .c files in a
+	subdirectory with UseCache.  Execute cons again, making
+	sure nothing was recompiled.  Execute cons -r to remove
+	generated files from the subdirectory.  Execute cons again,
+	checking the output to make sure that the generated files
+	were retrieved from the cache.  Cons -r again to remove
+	files.  Cons -cc to fetch files from cache again, but
+	check output to make sure it looks like normal build
+	commands.
+
+	NOTE:  THIS TEST EXAMINES THE ACTIONS USED TO BUILD FILES.
+
+t/t0042.t		UseCache, -cd
+
+	Compile a single executable from three .c files in a
+	subdirectory with UseCache.  Execute cons again, making
+	sure nothing was recompiled.  Execute cons -r to remove
+	generated files from the subdirectory.  Execute cons again,
+	checking the output to make sure that the generated files
+	were retrieved from the cache.  Cons -r again to remove
+	files.  Execute cons -cd, checking output to make sure that
+	Cons reports caching is disabled and that files were built
+	normally.
+
+	NOTE:  THIS TEST EXAMINES THE ACTIONS USED TO BUILD FILES.
+
+t/t0043.t		UseCache, -cr
+
+	Compile a single executable from three .c files in a
+	subdirectory with UseCache.  Execute cons again, making
+	sure nothing was recompiled.  Execute cons -r to remove
+	generated files from the subdirectory.  Execute cons again,
+	checking the output to make sure that the generated files
+	were retrieved from the cache.  Cons -r again to remove
+	files.  Execute cons -cr.  Make sure the file was built
+	correctly, but don't check output, since the random build
+	means we don't know the actual order...
+
+t/t0044.t		UseCache, -cs
+
+	Compile a single executable from three .c files in a
+	subdirectory (without UseCache).  Recreate the Construct
+	file with UseCache.  Execute cons -cs to populate the
+	cache with the already-built objects and executable.
+	Execute cons -r to remove the generated files.  Execute
+	Cons and examine output to make sure that the targets
+	were copied from the cache.
+
+t/t0045.t		error exit status
+
+	Define a Construct file that (using Command) creates a
+	derived file from a perl script.  The perl script
+	exits 1 (error).  Execute Cons; check that the Cons
+	exit status indicates an error.
+
+t/t0046.t		rebuild after Program error
+
+	Define a Construct file that (using Program) creates three
+	derived programs from C source.  The second C source contains
+	a syntax error.  Execute Cons; check that the Cons exit code
+	indicates an error, and that neither the second nor third
+	derived programs were created (i.e., Cons stopped at the error
+	compiling the second program).  Replace the second source file
+	with one that works.  Execute Cons again.  Check that only the
+	second and third files were built.
+
+	NOTE:  THIS TEST EXAMINES THE ACTIONS USED TO BUILD FILES.
+
+t/t0047.t		rebuild after single-command Command error
+
+	Define a Construct file that (using Command) creates three
+	derived files from perl scripts.  The second perl
+	script exits 1 (error).  Execute Cons; check that the Cons
+	exit code indicates an error, and that the third derived
+	file was NOT created (i.e., the build stopped at the
+	second file).  Replace the second perl script with one
+	that works.  Execute Cons again.  Check that only the
+	second and third files were created.
+
+t/t0048.t		rebuild after multi-command Command error
+
+	Define a Construct file that (using Command) creates three
+	derived files from perl scripts.  The second perl
+	script exits 1 (error).  Execute Cons; check that the Cons
+	exit code indicates an error, and that the third derived
+	file was NOT created (i.e., the build stopped at the
+	second file).  Replace the second perl script with one
+	that works.  Execute Cons again.  Check that only the
+	second and third files were created.
+
+t/t0049.t		InstallAs
+
+	Create a file in a subdirectory.  Check that InstallAs from a
+	file to a list fails as it should.  Check that InstallAs from a
+	list to a file fails as it should.  Check that InstallAs with
+	unequal length lists fails as it should.  Use InstallAs to
+	install file into another subdirectory with a different name;
+	check that it succeeded.  Use InstallAs to install a list of
+	two files (the same file twice) to two differently-named files
+	in another subdirectory; check that it succeeded.
+
+t/t0050.t		FilePath
+
+	Create a Construct file and a Conscript file in a subdirectory.
+	The Construct file prints to an output file the result of two
+	FilePath calls, one each to an existent file and a non-existent
+	file.  The Conscript prints to an output file the result of a
+	single FilePath call with two arguments, one each to an
+	existent file and a non-existent file, but returned to an
+	array.  Check the output files.  Rewrite the Construct file
+	so it does FilePath on the subdirectory as an argument to
+	Default; check that cons issues the appropriate warning about
+	improper use of FilePath, but otherwise builds successfully.
+
+t/t0051.t		DirPath
+
+	Create a Construct file and a Conscript file in a subdirectory.
+	The Construct file prints to an output file the result of three
+	DirPath calls, one each to the current directory, a non-existent
+	subdirectory, and a subdirectory.  The Conscript prints to
+	an output file the result of a single DirPath call with three
+	arguments, one each to the current directory, a non-existent
+	subdirectory, and a subdirectory, but returned to an array.
+	Check the output files.
+
+t/t0052.t		SourcePath
+
+	PLACEHOLDER.  TEST TO BE WRITTEN.
+
+t/t0053.t		ConsPath
+
+	PLACEHOLDER.  TEST TO BE WRITTEN.
+
+t/t0054.t		SplitPath
+
+	PLACEHOLDER.  TEST TO BE WRITTEN.
+
+t/t0055.t		@ suppression
+
+	Create a Construct file with two Commands, one single-line
+	and one multi-line, that each pseudo-install a file.  Make
+	sure it builds all right.  Recreate the Construct file with
+	the single-line Command and one of the lines in the multi-line
+	Command prefixed "@ ".  Rebuild and examine the build output
+	to verify that the @-lines are suppressed.
+
+t/t0056.t		../.. above top-level directory
+
+	Install a file from a subdirectory two levels deep
+	into a top-level directory referenced by "../..".
+	Make sure it doesn't get installed if the target is ".",
+	but does if the target is "../.." or "/".
+
+t/t0057.t		%[ %] substitution
+
+	Define an environment with two sub references as
+	construction variables.  Call each on the list of targets,
+	both separately and on the same line, dumping them to a
+	file.  Check that the output matches what we expect.
+
+t/t0058.t		-t
+
+	Create a Construct and subdirectory Conscript file each of
+	which builds a single Program.  Execute Cons from the
+	subdirectory; make sure nothing was built.  Execute Cons -t
+	from the subdirectory; make sure it only built the
+	program in the subdirectory.  Build the entire tree.
+	Execute Cons -t -r from the subdirectory; make sure it only
+	removed the program in the subdirectory.  Cons -r
+	the entire tree.  Remove the Construct file.  Execute
+	Cons -t from the subdirectory; make sure it fails when
+	it can't find the Construct file.
+
+t/t0059.t		-t, Default sub-target
+
+	Create Construct and subdirectory Conscript files, each of
+	which builds two Programs and defines one of them as the
+	Default.  Execute "cons" in the subdirectory; make sure nothing
+	built.  Execute "cons -t" in the subdirectory; make sure
+	that only the subdirectory default was built.  Execute "cons"
+	in the main directory; make sure only the default was built.
+	Execute "cons ." in the main directory; make sure the non-
+	default programs were built.  Execute "cons -t -r" in the
+	subdirectory; make sure only the subdirectory default was
+	removed.  Execute "cons -r" in the main directory; make sure
+	its default was removed.
+
+t/t0060.t		-t, Default
+
+	Make three sub-subdirectories, each of which builds two Programs.
+	The intermediate subdirectory Conscript file specifies two of
+	these directories as Default.  Invoke Cons from one of the default
+	sub-subdirectories; check that nothing was built.  Invoke Cons -t
+	from that sub-subdirectory; check that its Programs were built as
+	default.  Invoke Cons; check that the other Default Programs were
+	built.	Invoke Cons .; check that the last Programs were built.
+	Invoke Cons -t -r from the other Default sub-subdirectory; check
+	that only its Programs were removed.  Invoke Cons -r; check that
+	the original Default sub-subdirectory's Programs were removed.
+
+t/t0061.t		Objects
+
+	Create two Programs, one in a subdirectory, each from three
+	object files.  For each Program, the object files are listed
+	via the Objects method, one in the local directory, one in
+	a subdirectory, and the last in sub-subdirectory.  Build the
+	Programs and make sure they built correctly.
+
+t/t0062.t		Precious
+
+	Create two output files by appending the contents of separate
+	input files.  Make one of output files Precious.  Create the files
+	with initial contents; make sure everything built correctly.
+	Update the input file contents.  Build again, making sure that
+	the Precious file has both input versions and the non-Precious
+	file has only the first.
+
+t/t0063.t		Precious, build failure
+
+	Create a Precious output file by using a script to append the
+	contents of an input file.  Build the output file; make sure
+	its contents are correct.  Change the input file, and change the
+	script to fail.  Re-build the output file; make sure it didn't
+	change at all.	Change the script to append the contents again.
+	Re-build the output file, and make sure contents that didn't
+	get appended on the previous re-build are now there.
+
+t/t0064.t		Install failure
+
+	Arrange for two files to be Installed in two different
+	subdirectories of an installation directory.  Put a copy of
+	the first file by hand in the first subdirectory.  Remove write
+	permission from the first subdirectory and its file.   Invoke
+	Cons -k.  Check standard output and error output to make sure
+	the install on the non-writable directory failed.  Check that
+	the second file was properly installed in the second subdirectory.
+
+t/t0065.t		CPPPATH with same-named file/program
+
+	Create a Construct file that puts "." in CPPPATH and Builds a
+	Conscript file in a subdirectory, which builds a Program with the
+	same name as the subdirectory.	The Program #includes a header
+	file with the subdirectory explicitly named.  Make sure the
+	Program builds correctly and executes correctly.  (The failure
+	case we're checking for is confusion about whether the common
+	name refers to program or the subdirectory in which it resides
+	leading to a "Can't locate object method" error.)
+
+t/t0066.t		source file => unreadable derived file
+
+	Compile a Program from a source .c file.  Make the source file
+	non-readable, and change the Conscript file to generate the source
+	file from another input file.  Rebuild the Program, making sure
+	that the inability to read the .c file doesn't cause a failure.
+
+t/t0067.t		-t, Link
+
+	Compile a single executable from three .c files in a subdirectory
+	three levels deep.   Compilation takes place in a separate build
+	subdirectory established via the 'Link' command.  Build in the
+	source subdirectory without the -t option; check that nothing
+	was built.  Build -t in the source subdirectory; check that the
+	Linked executable was properly built in its directory.
+
+t/t0068.t		"0" as file and directory name
+
+	Build three Programs, one named "0", one named "0" in a
+	subdirectory, and one in a subdirectory named "0".
+
+t/t0069.t		CPPPATH array reference %-expansion
+
+	Compile a single executable from a single .c file in the
+	local directory, which includes a single .h file from a
+	subdirectory specified by a %-expansion reference in a
+	CPPPATH array.  Update the .h file and make sure the
+	executable gets rebuilt.
+
+t/t0070.t		file/directory failures
+
+	Create a Construct file that Builds Conscript.	Create a Conscript
+	file that Builds "foo/Conscript" and "foo/bar/Conscript".  Create
+	"foo/Conscript" that creates "bar" via a Command (copying another
+	file into it).	Run Cons; look for the error that "foo/bar" was
+	already a directory by the time it got to the Command line in the
+	subsidiary Conscript file.  Reverse the order:	Create another
+	Conscript file that createes "foo/bar" via Command, and create
+	another "foo/Conscript" that Builds "bar/Conscript"; Run Cons;
+	look for the error that "foo/bar" was already a file by the time
+	it got to the Build line in the subsidiary Conscript file.
+
+t/t0071.t		QuickScan
+
+	Create a build script that prints a file, with a very simple
+	include-file  capability.  Create a Construct file that uses
+	this build script (via Command) to create two output files from
+	separate input files.  Use QuickScan to associate code references
+	that look for the same include-file strings with the appropriate
+	files, including one recursive-include case.  Run Cons; look for
+	proper output.	Update the file that both input files include;
+	run Cons; look for proper output.  Update one of the other
+	included files; run Cons; look for proper output.  Update the
+	last included file; run Cons; look for proper output.
+
+t/t0101.t		Repository, no repository directory
+
+	Create a work subdirectory and a repository subdirectory.
+	The work subdirectory contains four .c files and a Construct
+	file with Repository pointing to a non-existant repository.
+	Invoke cons in the work subdirectory.  Make sure the
+	generated executable was built successfully from the work
+	subdirectory .c files.
+
+t/t0102.t		single-module Repository Program
+
+	Create a work subdirectory and a repository subdirectory.
+	The repository contains a single .c file.  The work
+	subdirectory contains the Construct file with Repository
+	pointing to the repository.  Invoke cons in the work
+	subdirectory.  Check to make sure the executable was
+	generated correctly from the repository .c file.
+
+t/t0103.t		single-module Repository Program, multiple repositories
+
+	Create a work subdirectory and two repository subdirectories.
+	The work subdirectory contains the Construct file with
+	Repository pointing to first the "new" repository and then
+	the "old" repository.  The "old" repository contains a
+	single .c file.  Invoke cons in the work subdirectory.
+	Check that the executable was generated correctly from the
+	"old" repository .c file.  Create a same-named .c file in
+	the "new" repository.  Invoke cons in the work subdirectory.
+	Check that the executable was re-generated correctly from
+	the "new" repository .c file.  Create a same-named .c file
+	in the work subdirectory.  Invoke cons again.  Check that
+	the executable was re-generated correctly from the work
+	subdirectory .c file.  Update both the "old" and "new"
+	repository .c files.  Invoke cons again.  Check that the
+	executable is still from the work subdirectory .c file.
+	Remove the work subdirectory .c file.  Invoke cons again.
+	Check that the executable has been rebuilt with the "new"
+	repository .c file.  Remove the "new" repository .c file.
+	Invoke cons again.  Check that the executable has been
+	rebuilt with the "old" repository .c file.
+
+t/t0104.t		multi-module Repository Program
+
+	Create a work subdirectory and a repository subdirectory.
+	The repository contains four .c files.  The work subdirectory
+	contains the Construct file with Repository pointing to
+	the repository.  Invoke cons in the work subdirectory.
+	Make sure the executable was generated from the repository
+	.c files.  Create a separate "work copy" of one of the
+	repository .c files in the work subdirectory.  Invoke cons
+	again.  Make sure the executable was generated from the
+	work .c file and the other repository .c files.  Create
+	separate "work copies" of all the remaining repository .c
+	files.  Invoke cons again.  Make sure the executable was
+	generated from all the work copies of the .c files.  Remove
+	the "work copy" of one o the .c files.  Invoke cons again.
+	Make sure the executable was generated from the repository
+	.c file for the work copy just removed.  Remove the "work
+	copies" of all the .c files.  Invoke cons again.  Make sure
+	the executable was generated from all the repository .c
+	files.
+
+t/t0105.t		multi-module Repository Program, multiple repositories
+
+	Create a work subdirectory and two repository subdirectories.
+	The work subdirectory contains the Construct file with
+	Repository pointing to first the "new" repository and then
+	the "old" repository.  The "old" repository contains four
+	.c files.  Invoke cons in the work subdirectory.  Check
+	that the executable was generated correctly from the "old"
+	.c files.  Create one .c files in the "new" repository and
+	another in the work sbudirectory.  Invoke cons again.
+	Check that the executable was generated correctly...  Create
+	all the remaining files in the work subdirectory.  Invoke
+	cons again.  Check...  Remove two files from the work
+	subdirectory, one with the name of the "new" repository
+	file, one not.  Invoke cons again and check...  Remove the
+	remaining work files.  Invoke cons again and check...
+	Remove the last "new" repository .c file.  Invoke cons
+	again and check that we're back to all "old" repository
+	files.
+
+t/t0106.t		single-module Program, -R
+
+	Create a repository subdirectory with a .c file and Construct.
+	Invoke cons -R repository in a separate work subdirectory.
+	Check that the executable built correctly.  Check that an
+	immediate re-invocation doesn't build anything.  (Simultaneously
+	check that -Rrepository with no space works.)  Create a
+	new .c file in the work subdirectory; re-invoke cons -R
+	and check that the executable re-built correctly.  Re-invoke
+	immediately to check for no unnecessary rebuilt.  Update
+	the repository .c file; cons -R; check that it didn't
+	mistakenly pick up the updated repository file.  Remove
+	the work .c file; cons -R; check that it correctly built
+	with the updated repository file.
+
+t/t0107.t		single-module Program, multiple -R
+
+	Create two repository subdirectories with a single .c and
+	Construct file in the "old" repository.  Invoke cons -R -R
+	in a work subdirectory.  Check that it built correctly.
+	Create a .c in the "new" repository; invoke cons -R -R;
+	check that the executable built with the new .c file.
+	Create a .c in the work subdirectory; cons -R -R; check
+	that the executable built with the work .c file.  Update
+	both repository .c files; cons -R -R; check that the
+	executable still uses the work .c file.  Remove the work
+	.c file; cons -R -R; check that the executable uses the
+	new repository .c file.  Remove the new repository .c file;
+	cons -R -R; check that the executable uses the old repository
+	.c file.
+
+t/t0108.t		multi-module Program, -R
+
+	Create a work subdirectory and a repository subdirectory.
+	The repository contains four .c files to build into an
+	executable and a Construct file.  Invoke cons -R in the
+	work subdirectory; check that the executable was built
+	correctly from repository .c files.  Create a work subdirectory
+	copy of one of the .c files; invoke cons -R; check that
+	the executable uses the one work .c files and the rest from
+	the repository.  Create work copies of the remaining .c
+	files; cons -R; check that the executable uses all the work
+	.c files.  Remove one work .c files; cons -R; check that
+	the executable uses the repository .c file for the one
+	removed.  Remove the rest of the work .c files; cons -R;
+	check that the executable uses all the repository .c files.
+
+t/t0109.t		multi-module Program, multiple -R
+
+	Create a work subdirectory and two repository subdirectories.
+	Create four .c files and a Construct file in the "old"
+	repository.  Invoke cons -R -R in the work subdirectory.
+	Check that the executable built correctly from the "old"
+	.c files.  Create a .c file in the "new" repository and
+	one in the work subdirectory; invoke cons -R -R again;
+	check that the executable was build correctly with the new
+	.c file and the work .c files.  Create work copies of the
+	remaining .c files; cons -R -R; check that executable was
+	built with all the work .c files.  Remove two work .c files;
+	cons -R -R; check that the executable was built with the
+	repository .c files, one old and one new.  Remove the
+	remaining two work .c files; cons -R -R; check that the
+	executable was built with one new .c files and three old
+	.c files.  Remove the new repository .c files; cons -R -R;
+	check that the executable was built with all old .c files.
+
+t/t0110.t		Repository .h file
+
+	Create a work subdirectory and a repository subdirectory.
+	The repository contains a .c file and a .h file, the latter
+	included by the .c file.  The work subdirectory contains
+	a Construct file with Repository pointing to the repository
+	and 'Program' to build an executable from the .c file.
+	Build the executable from the repository copies.  Create
+	a work copy of the .h file.  Build again; check that the
+	executable picked up the work copy of the .h file.  Create
+	a work copy of the .c file.  Build again; check that the
+	executable picked up the work copies of both the .c and .h
+	file.  Remove the work copy of the .h file.  Build again;
+	check that the executable now uses the repository copy of
+	the .h file.
+
+t/t0111.t		Repository nested .h files
+
+	Create a work subdirectory and a repository subdirectory.
+	The repository contains one .c file, which includes a .h
+	file, which in turn includes another .h file.  The work
+	subdirectory contains a Construct file with Repository
+	pointing to the repository and 'Program' to build an
+	executable from the .c file.  Invoke cons in the work
+	subdirectory to build the executable from the repository
+	source files.  Check that the executable was built correctly.
+	Create a work copy of the "intermediate" .h file.  Build
+	again.  Check that the executable picked up the work .h
+	file.  Create a work copy of the .c file.  Build again and
+	check the executable.  Create a work copy of the last .h
+	file.  Build and check...  Remove the work copies of the
+	.c file and the intermediate .h file.  Build and check...
+	Remove the work copy of the last .h file.  Build and check
+	that we're back to the repository copies of all files.
+
+t/t0112.t		-R, multi-dir .h
+
+	Create src and include subdirectories in a work subdirectory
+	and a repository subdirectory.  CPPPATH in the repository
+	Construct file specifies src:include.  A .c file in the
+	src subdirectory #includes a .h file in the src subdirectory,
+	which nested #includes a .h file in the include subdirectory.
+	Build in the repository.  Build in the work directory;
+	everything should still be up-to-date.  Create a work copy
+	of the include subdirectory .h file; build.  Create a work
+	copy of the src subdirectory .h file; build.  Remove the
+	work copy of the include subdirectory .h file; build.
+
+t/t0113.t		multi-module Repository Program within repository
+
+	Create a repository subdirectory.  The repository contains
+	four .c files and a Construct file.  The Construct files
+	specifies Repository {absolute path to repository subdirectory}.
+	Invoke cons in the repository subdirectory.  Check that
+	everything built correctly.  Invoke cons again; check that
+	everything was up-to-date and nothing was built.  Update
+	one .c file in the repository.  Invoke cons in the repository;
+	check that the new .c file was compiled and linked in.
+	Invoke cons again; check that everything was up-to-date
+	and nothing was built.
+
+t/t0114.t		Repository link with .o from repository
+
+	Create a repository directory with four .c files and a
+	Construct file pointing to the Repository.  Build the
+	executable in the repository directory.  "Lock" the repository
+	directory by removing all write permissions.  Copy the
+	Construct file to the work directory.  Invoke cons in the
+	work subdirectory.  check that it didn't re-build the
+	executable (the repository binary is up-to-date).  Create
+	a work .c file; invoke cons in the work subdirectory; check
+	that the executable re-built in the work subdirectory with
+	the work .c file.  Remove the work .c file; cons; check
+	that the executable re-built in the work directory with
+	the repository .c file again.  Re-build in the repository
+	to check that nothing there re-builds.
+
+t/t0115.t		Repository Build
+
+	Create a repository directory and a work directory, with
+	a src directory under each.  The repository/src directory
+	contains three .c files and a Conscript file.  The work
+	Construct file Builds the Conscript file and Repository
+	points to the repository.  Invoke cons in the work
+	subdirectory.  Check that it built the executable in the
+	src subdirectory, correctly picking up the files from the
+	repository.  Build again; check that nothing is rebuilt.
+
+t/t0116.t		top-level (#) path name, -R
+
+	Create a repository directory and a work directory.  The
+	repository contains two subdirectories, one with two
+	.c files and one with one .c file.  The Conscript file
+	specifies the separate .c file with a top-level (#) file
+	name.
+
+t/t0117.t		absolute (/) path name, -R
+
+	Compile a single executable in a subdirectory from three
+	.c files, two in a repository and one in a separate
+	subdirectory.   The .c file in the separate subdirectory
+	is specified with an absolute (initial '/') path name.
+
+t/t0118.t		Library, -R
+
+	Build a library from two modules in a repository directory.
+	Link the library to another modules from the repository
+	directory to generate an executable.
+
+t/t0119.t		Library update, -R
+
+	Build a library in the local directory from two modules in
+	the repository directory.  Link it to another module from
+	the repository directory to generate an executable.  Create
+	a work copy of one of the library modules, and re-link the
+	executable.
+
+t/t0120.t		Library -R, link local .o with repository .a
+
+	Build a library from two modules in the repository, and
+	link it to another module in the repository to create a
+	repository executable.  Create a work copy of the other
+	module, link the repository library to it.
+
+t/t0121.t		Library -R, link local .a with repository .o
+
+	Build a library from two modules in the repository, and
+	link it to another module in the repository to create a
+	repository executable.  Create a work copy of one of the
+	library modules, create a local library, link the repository
+	module to the local library.
+
+t/t0122.t		Install, -R
+
+	Install a file from a repository subdirectory to an
+	installation subdirectory.  Invoke cons in a work directory
+	to install the file from the repository subdirectory.
+	Create a local work copy of the file and install it.
+
+t/t0123.t		CPPPATH, -R
+
+	Compile a single executable from a single repository .c
+	file which includes a single .h file from one of two
+	repository subdirectories.  Both subdirectories have the
+	same-named .h file.  Compile the executable twice, once
+	with the one subdirectory first in CPPPATH, then with the
+	other subdirectory first.
+
+t/t0124.t		Link, -R
+
+	Compile a single executable from three .c files in a
+	repository subdirectory.   Compilation takes place in a
+	separate local build subdirectory established via the 'Link'
+	command, pulling the .c files directly from the repository
+	subdirectory.
+
+t/t0125.t		Link update, -R
+
+	Compile a single executable from three .c files in a
+	repository src subdirectory.   Compilation takes place in
+	a separate local build subdirectory established via the
+	'Link' command, pulling the .c files directly from the
+	repository subdirectory.  Create a .c file in the work src
+	subdirectory.  Re-compile to pick up the local .c file in
+	the build subdirectory.
+
+t/t0126.t		Link update, -R, link with repository .o files
+
+	Compile a single executable from three .c files in a
+	repository src subdirectory.   Compilation takes place in
+	a repository build subdirectory established via the 'Link'
+	command.  In the work directory, invoke cons; nothing should
+	get built because the repository executable is up-to-date.
+	Create a .c file in the work src subdirectory.  Re-compile
+	to pick up the local .c file, and make sure no other work
+	subdirectory .o files were created.
+
+t/t0127.t		single-environment variant builds, -R
+
+	In the repository, define a single executable compiled from
+	three .c files in a source subdirectory.  One module has
+	a conditional #include for the selected OS.  Compilation
+	takes place in two separate build subdirectories established
+	via the 'Link' command in two separate invocations of cons.
+	The appropriate build directory is specified via "OS=" on
+	the cons command line.  Build one OS in the repository.
+	Invoke cons for the same OS in the work subdirectory;
+	nothing should get built.  Invoke cons for the second OS
+	in the work subdirectory, check that it built properly.
+	Update a .h file in the work subdirectory and re-build the
+	second OS; make sure it picked up the new .h file.  Invoke
+	cons for the first OS in the work subdirectory; check that
+	it built correctly.
+
+t/t0128.t		multiple-environment variant builds, -R, .c update
+
+	In the repository, define a single executable compiled from
+	three .c files in a source subdirectory.  One .c file has
+	a conditional #include for the selected OS.  Compilation
+	takes place in two separate build subdirectories with
+	separate Conscript files that establish 'Link' to the source
+	subdirectory and separate build environments.  Both Conscript
+	builds are invoked from the Construct file.  Build the two
+	executables in the repository.  Invoke cons in the work
+	subdirectory; nothing should get built (repository executables
+	are up-to-date).  Create a work copy of one of the .c files.
+	Invoke cons again in the work subdirectory; check that the
+	executables were constructed correctly and none of the
+	other .o files were created in the work directory.
+
+t/t0129.t		multiple-environment variant builds, -R, .h update
+
+	In a repository subdirectory, define a single executable
+	compiled from a .c file in source subdirectory, which
+	includes a local .h file.  Both .c and .h have #ifdefs for
+	a selected "OS".  Compilation takes place in two separate
+	build subdirectories established via 'Link' to the source
+	subdirectory.  Each build subdirectory has a Conscript file
+	establishing the build environment.  Build; both copies
+	should be built, each for their "OS".  Build in the work
+	subdirectory; everything should be up-to-date, and no work
+	.o files or executables should be generated.  Create a work
+	copy of the .h file; build; new executables should pick up
+	the new values from the .h file.
+
+t/t0130.t		multi-environment variant builds, -R, multi-dir .h
+
+	In a repository, create xxx and include subdirectories in
+	a src subdirectory, and a build subdirectory with separate
+	subdirectores for two variant "OS" builds.  CPPPATH in the
+	repository Construct file specifies src/xxx:src/include.
+	A .c file in the xxx subdirectory #includes a .h file in
+	the xxx subdirectory, which nested #includes a .h file in
+	the include subdirectory.  Build in the repository.  Build
+	in the work directory; everything should still be up-to-date.
+	Create a work copy of the include subdirectory .h file;
+	build.  Create a work copy of the xxx subdirectory .h file;
+	build.  Remove the work copy of the include subdirectory
+	.h file; build.
+
+t/t0131.t		selective targeting, -R
+
+	In the repository subdirectory, create three .c files in
+	the local directory, and two .c files in a subdirectory,
+	with Construct and Conscript files to create separate
+	executables from each.  In the work subdirectory, invoke
+	cons with no arguments and make sure nothing gets built.
+	In the work subdirectory, invoke cons -R with one of the
+	local executables as an argument and make sure only it gets
+	built.  In the work subdirectory, invoke cons -R with one
+	of the local executables and the subdirectory as arguments
+	and make sure only those executables get built.  In the
+	work subdirectory, invoke cons -R with '.' as an argument
+	and make sure the last local executable gets built.
+
+t/t0132.t		Default, -R
+
+	Define three executables to be compiled from separate .c files
+	in the repository subdirectory, and three more in a subdirectory
+	of the repository.  Specify a 'Default' target of one of the
+	executables in each subdirectory.  Invoke cons in the work
+	subdirectory with no arguments.  Make sure only the default
+	executables get built.  Invoke cons in the work subdirectory
+	with '.' as argument.  Make sure the rest of the executables
+	get built.
+
+t/t0133.t		build pruning, -R
+
+	In the repository subdirectory, define two separate
+	executables to be compiled from single .c files via separate
+	Conscript files in separate subdirectories.  Invoke cons
+	in the work subdirectory, pruning the build to one of the
+	subdirectories ('+subdir') and make sure only the executable
+	in that subdirectory gets built.  Invoke cons in the work
+	subdirectory with '.' as an argument.  Make sure the other
+	subdirectory's executable now got built, too.
+
+t/t0134.t		-o overrides, -R
+
+	Define an executable to be built from a single .c file in
+	the repository subdirectory.  The .c files prints a single
+	string to be supplied via '-DSTRING=' from CFLAGS in the
+	build environment.  Build the executable in the repository;
+	make sure the executable is build with the default STRING
+	value.  Create a work-subdirectory override file that
+	changes CFLAGS when generating the .o file.  Invoke cons
+	in the work subdirectory with the override file;; make sure
+	the executable is built with the overridden STRING value.
+	Invoke cons again in the work subdirectory, without the
+	override; make sure the executable has reverted to the
+	original STRING value.
+
+t/t0135.t		-r, -R
+
+	In a repository subdirectory, create Construct and Conscript
+	files for creating four executables, two from
+	.c files in the local directory and two from .c files in a
+	subdirectory.  In the work subdirectory, invoke cons -R to
+	build .o files and executables from these source files.
+	Invoke cons in the repository build repository .o and
+	executable files.  In the work subdirectory, remove one of
+	the local executables and .o file using -r.  Remove the
+	executables and .o files from the subdirectory using -r.
+	Remove the rest of the executables and .o files using -r.
+
+t/t0136.t		-p, -R
+
+	In a repository subdirectory, create Construct and Conscript
+	files for creating four executables, two from .c files in
+	the local directory and two from .c files in a subdirectory.
+	Invoke cons -p -R in the work subdirectory.  Compare the
+	output against expected results.
+
+t/t0137.t		-pa, -R
+
+	In a repository subdirectory, create Construct and Conscript
+	files for creating four executables, two from .c files in
+	the local directory and two from .c files in a subdirectory.
+	Invoke cons -pa -R in the work subdirectory.  compare the
+	output against expected results.
+
+t/t0138.t		-pw, -R
+
+	In a repository subdirectory, create Construct and Conscript
+	files for creating four executables, two from .c files in
+	the local directory and two from .c files in a subdirectory.
+	Invoke cons -pw -R in the work subdirectory.  Compare the
+	output against expected results.
+
+t/t0139.t		-d, -R
+
+	In a repository subdirectory, create Construct and Conscript
+	files for creating four executables, two from .c files in
+	the local directory and two from .c files in a subdirectory.
+	Invoke cons -d -R in the work subdirectory.  Compare the
+	output against expected results.
+
+	NOTE:  THIS TEST EXAMINES THE ACTIONS USED TO BUILD FILES.
+
+t/t0140.t		-wf, -R
+
+	In a repository subdirectory, create Construct and Conscript
+	files for creating four executables, two from .c files in
+	the local directory and two from .c files in a subdirectory.
+	Invoke cons -wf file -R in the work subdirectory.  Compare
+	the -wf output against expected results.  Make sure the
+	executables were generated correctly.
+
+t/t0141.t		-R, strip current directory
+
+	Create subdirectories work, foo, and bar.  Construct file
+	specifies a CPPPATH of .:zzz, a Prgoram that builds a single
+	.c file, and a Command that prints %CCCOM to an output
+	file.  In the work directory, invoke cons -R foo -R work
+	-R bar.  Examine the CCCOM output to make sure that the list
+	of directories specified via -I flags properly excludes the
+	work subdirectory in which we executed.
+
+	NOTE:  THIS TEST EXAMINES THE ACTIONS USED TO BUILD FILES.
+
+t/t0142.t		Local
+
+	Create an executable from a .c file in the repository.
+	Build in a work subdirectory; everything is up-to-date.
+	Create a work Construct file that specifies the executable
+	is Local.  Build; the repository executable should be copied
+	into the work directory.  Create a work .c file; build;
+	the work executable should be updated.
+
+t/t0143.t		Repository_Sig_Times_OK
+
+	Create two executables from two .c files in the repository.
+	Build in a work subdirectory; everything is up-to-date.
+	Touch one of the executables in the repository, making its
+	time-stamp out-of-sync with the .consign file.  Create a
+	work Construct file that specifies Repository_Sig_Times_OK
+	0; build; everything should still be "up-to-date" despite
+	the mismatched time-stamps.  Create a work Construct file
+	that specifies Repository_Sig_Times_OK 1; build; check that
+	a work copy of the executable was built.
+
+t/t0144.t		Repository_List
+
+	Create four empty repository directories, and a work
+	Construct file that specifies Repository for two of them,
+	and then fetches the Repository_List and prints it to a
+	file.  Invoke cons; check that the list was printed correctly.
+	Invoke cons -R -R, check that the argument repositories
+	preced the Construct file repositories.  Re-create the
+	Construct file without the Repository method.  Invoke cons
+	-R -R -R, check that the repository list is correct despite
+	the lack of the Repository method.  Invoke cons without any
+	-R flags, check that the output lists no repositories.
+
+t/t0145.t		Install + Local
+
+	Make an installation subdirectory in a repository and a
+	work subdirectory.  The repository Construct file specifies
+	installation of a shell script into the install subdirectory.
+	Build in the repository.  Build in the work subdirectory;
+	everything should be up-to-date.  Create a work copy of
+	the Construct file that specifies that the installed file
+	should be Local; build; see that the script was correctly
+	installed in the work/install subdirectory from the repository
+	copy.  Create a work copy of the script; build; see that
+	the work copy was installed.
+
+t/t0146.t		Install_Local
+
+	Make an installation subdirectory in a repository and a
+	work subdirectory.  The repository Construct file specifies
+	installation of a shell script into the install subdirectory.
+	Build in the repository.  Build in the work subdirectory;
+	everything should be up-to-date.  Create a work copy of
+	the Construct file that specifies Install_Local; build;
+	see that the script was correctly installed in the work/install
+	subdirectory from the repository copy.  Create a work copy
+	of the script; build; see that the work copy was installed.
+
+t/t0147.t		InstallAs, -R
+
+	Invoke cons in a work directory to install a file from a
+	repository subdirectory to a differently-named file in an
+	installation subdirectory.  Add a local Construct file to
+	install the repository file to another name in the installation
+	subdirectory.  Add a local work copy of the file and install it
+	to the file named in in the local Construct file.  Remove the
+	local Construct file and install the local work copy of the file
+	to the installation file named in the repository Constrcut file.

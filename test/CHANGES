@@ -1,0 +1,284 @@
+Cons regression test suite changes
+
+$Id: CHANGES,v 1.1 2000/06/01 22:04:42 knight Exp $
+
+
+
+Changes in cons release 2.0:
+
+	Integrated the formerly-separate cons-test suite into the cons
+	package itself.
+
+	Added FSF copyright and GPL notices to all relevant files.
+
+
+
+Changes in cons-test release 3.1 (never released separately):
+
+	Added new tests for previously untested features:
+		t/t0061.t		Objects
+		t/t0071.t		QuickScan
+
+	Added new tests for bug fixes:
+		t/t0064.t		Install failure
+		t/t0065.t		CPPPATH with same-named file/program
+		t/t0066.t		source file => unreadable derived file
+		t/t0068.t		"0" as file and directory name
+		t/t0069.t		CPPPATH array reference %-expansion
+
+	Added new tests for new Cons 2.0 features:
+		t/t0055.t		@ suppression
+		t/t0056.t		../.. above top-level directory
+		t/t0057.t		%[ %] substitution
+		t/t0058.t		-t
+		t/t0059.t		-t, Default sub-target
+		t/t0060.t		-t, Default super-directory
+		t/t0062.t		Precious
+		t/t0063.t		Precious, build failure
+		t/t0067.t		-t, Link
+		t/t0070.t		file/directory failures
+
+	Modified existing tests for Cons 2.0 features and fixes:
+		t/t0021.t		Default
+		t/t0050.t		FilePath
+		t/t0036.t		%-variables
+		t/t0132.t		Default, -R
+
+
+
+Changes in cons-test release 3.0:
+
+	Rewrote all tests in Perl.  Added the external Test::Cmd module
+	for underlying management of temporary directories, program
+	execution, etc.  Added our own Test::Cmd::Cons modules for
+	control of Cons-specific things.
+
+	The Perl tests don't require execute permission on the Cons
+	script under test; update cons-test.pl so it no longer enforces
+	that restriction.
+
+	Added a version of Cons directly to this package to accomodate
+	any necessary differences between what's currently released and
+	what we're writing the tests to.  Include the released version
+	of Cons we used as a basis as well, and generate diff output to
+	let everyone know what's going on.
+
+	Added two new tests:
+		t/t0050.t		FilePath
+		t/t0051.t		DirPath
+
+
+
+Changes in cons-test release 2.2:
+
+	Added tests for salting signatures and derived-file caching:
+		t0038a.sh		Salt
+		t0039a.sh		UseCache
+		t0040a.sh		UseCache, selective update
+		t0041a.sh		UseCache, -cc
+		t0042a.sh		UseCache, -cd
+		t0043a.sh		UseCache, -cr
+		t0044a.sh		UseCache, -cs
+
+	Added tests for handling build errors:
+		t0045a.sh		error exit status
+		t0046a.sh		rebuild after Program error
+		t0047a.sh		rebuild after single-command Command error
+		t0048a.sh		rebuild after multi-command Command error
+
+	Added tests for InstallAs:
+		t0049a.sh		InstallAs
+		t0147a.sh		InstallAs, -R
+
+	Modified all tests to get rid of non-portable ${VAR:-xxx}
+	constructs and non-portable use of "test -a".
+
+	Changed the name of Tests.doc to Tests.txt to avoid confusion
+	with Microsoft Word documents.
+
+	Added ToDo file to document additional tests that are needed
+	and other future work.
+
+	Updated the date in the README file and add a paragraph to the
+	introduction.
+
+
+
+Changes prior to cons-test release 2.1:
+
+	Modified cons-test.pl to accept environment variable changes
+	("CC=gcc") as arguments on the command line and pass them
+	through to the underlying tests.
+
+	Modified all tests to use and expand $CC, $AR, and $RANLIB
+	from the environment when setting up the Cons environments
+	and comparing output.
+	[Fix courtesy Rajesh Vaidheeswarran.]
+
+	Made all tests consistent in handling output from Cons:
+	stdout and stderr are combined and displayed on error if
+	the (sub-)test is not actually examining output.  If it
+	is, then stdout and stderr are separated, stderr is displayed
+	on error, and contents of both are checked on success.
+
+	Added test of Cons -h and Help functionality:
+		t0037a.sh		-h, Help
+	[New functionality in cons-1.4a3 courtesy Rajesh Vaidheeswarran.]
+
+	Added tests of new Repository-related methods:
+		t0144a.sh		Repository_List
+		t0145a.sh		Install + Local
+		t0146a.sh		Install_Local
+	(The Install + Local test was the old Local method test.)
+
+	Changed the old test of the Local method:
+		t0142a.sh		Local
+	to test the Local method when used on a generated executable
+	without the Install method being involved.
+
+	Added explanation of the flags to the usage message.
+
+	Modified cons-test.pl to issue warnings if the environment
+	variables CC, AR, and RANLIB are not set, and a -q flag
+	to suppress the warnings.
+	[Change courtesy Rajesh Vaidheeswarran.]
+
+	Modified tests to use the more portable test -s instead of
+	test -e.
+	[Bug report courtesy Rajesh Vaidheeswarran.]
+
+Changes prior to cons-test release 2.0:
+
+	Added tests to cover the new Repository feature, related
+	functionality, and interaction with existing Cons functionality:
+		t0101a.sh	Repository, no repository directory
+		t0102a.sh	single-module Repository Program
+		t0103a.sh	single-module Repository Program, multiple repositories
+		t0104a.sh	multi-module Repository Program
+		t0105a.sh	multi-module Repository Program, multiple repositories
+		t0106a.sh	single-module Program, -R
+		t0107a.sh	single-module Program, multiple -R
+		t0108a.sh	multi-module Program, -R
+		t0109a.sh	multi-module Program, multiple -R
+		t0110a.sh	Repository .h file
+		t0111a.sh	Repository nested .h files
+		t0112a.sh	-R, multi-dir .h
+		t0113a.sh	multi-module Repository Program within repository
+		t0114a.sh	Repository link with .o from repository
+		t0115a.sh	Repository Build
+		t0116a.sh	top-level (#) path name, -R
+		t0117a.sh	absolute (/) path name, -R
+		t0118a.sh	Library, -R
+		t0119a.sh	Library update, -R
+		t0120a.sh	Library -R, link local .o with repository .a
+		t0121a.sh	Library -R, link local .a with repository .o
+		t0122a.sh	Install, -R
+		t0123a.sh	CPPPATH, -R
+		t0124a.sh	Link, -R
+		t0125a.sh	Link update, -R
+		t0126a.sh	Link update, -R, link with repository .o files
+		t0127a.sh	single-environment variant builds, -R
+		t0128a.sh	multiple-environment variant builds, -R, .c update
+		t0129a.sh	multiple-environment variant builds, -R, .h update
+		t0130a.sh	multi-environment variant builds, -R, multi-dir .h
+		t0131a.sh	selective targeting, -R
+		t0132a.sh	Default, -R
+		t0133a.sh	build pruning, -R
+		t0134a.sh	-o overrides, -R
+		t0135a.sh	-r, -R
+		t0136a.sh	-p, -R
+		t0137a.sh	-pa, -R
+		t0138a.sh	-pw, -R
+		t0139a.sh	-d, -R
+		t0140a.sh	-wf, -R
+		t0141a.sh	-R, strip current directory
+		t0142a.sh	Local
+		t0143a.sh	Repository_Sig_Times_OK
+
+	Added a -d dir option to the cons-test.pl script, to allow
+	specification of an alternate directory in which it will
+	search for tests (files with names of form t[0-9]*a.sh).
+
+	Fixed tests t0028a.sh, t0029a.sh, and t0030a.sh to not
+	hard-code the name 'cons' in the comparison output, allowing
+	successful testing of scripts with other names.
+
+Changes prior to cons-test release 1.2:
+
+	Add a test case to cover all manner of %-variable command
+	substitution.  [Bug reported by Bob Sidebotham, 22 October
+	1998.]
+
+	Fixed problems printing numbers of tests passed (unitialized
+	$pass) and failed (@array needed to be in explicit scalar
+	context).  [Bug reported and fix supplied by Bob Sidebotham,
+	21 October 1998.]
+
+	Added checks for existence and executability of the cons
+	script under test before trying to execute the tests.
+	[Bug reported by Bob Sidebotham, 21 October 1998.]
+
+	Changed the exit subroutines to chmod the directories under
+	$work even when preserving the work directories.  This
+	makes it easier to clean up by hand even when the test
+	removes write permission.
+
+Changes prior to cons-test release 1.1:
+
+	Added tests for command-line arguments:
+		t0028a.sh	-f dir/Construct
+		t0029a.sh	-r
+		t0030a.sh	-k
+		t0031a.sh	-p
+		t0032a.sh	-pa
+		t0033a.sh	-pw
+		t0034a.sh	-d
+		t0035a.sh	-wf
+
+	Don't use system() to execute the tests, fork and exec so
+	we can catch interrupts and terminate.
+
+	Fixed the fail() routine so that it reports the sub-test
+	number even if there's no input to display.
+
+	Added a description of each test to the header of each test
+	file.
+
+	Created a 'Tests.doc' file to collect all the test descriptions
+	in a central location.
+
+Changes prior to cons-test release 1.0:
+
+	Added tests for basic functionality:
+		t0001a.sh	single-module Program
+		t0002a.sh	multiple-module Program
+		t0003a.sh	selective module update
+		t0004a.sh	Build
+		t0005a.sh	top-level (#) path name
+		t0006a.sh	absolute (/) path name
+		t0007a.sh	Export / Import
+		t0008a.sh	\$ARG{}
+		t0009a.sh	Library
+		t0010a.sh	Library with selective module update
+		t0011a.sh	Install
+		t0012a.sh	single-module #include \"...\"
+		t0013a.sh	#include <...>, CPPPATH
+		t0014a.sh	CPPPATH
+		t0015a.sh	recursive #include <...>
+		t0016a.sh	selective #include <...> update
+		t0017a.sh	Link
+		t0018a.sh	single-environment variant builds
+		t0019a.sh	multiple-environment variant builds
+		t0020a.sh	selective targeting
+		t0021a.sh	Default
+		t0022a.sh	build pruning
+		t0023a.sh	overrides
+		t0024a.sh	clone
+		t0025a.sh	Command
+		t0026a.sh	Ignore
+		t0027a.sh	single-module Program
+
+	Created cons-test.pl for executing tests when not running
+	Aegis.
+
+	Created README file by way of rudimentary documentation.

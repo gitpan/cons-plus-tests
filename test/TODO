@@ -1,0 +1,17 @@
+Cons regression tests to-do list
+$Id: TODO,v 1.1 2000/06/01 22:05:12 knight Exp $
+
+Things that it would be good to have fixed, some day:
+
+    --	A way to make sure that .consign files don't get clobbered
+	on write errors (such as a full file system).  The code to guard
+	against this has been recently added to Cons, but I can't think
+	of how to simulate it in a test script without actually filling
+	up the $TMPDIR file system, which is pretty anti-social on
+	multi-user systems.
+
+    --	Untested methods (placeholder scripts need writing for real):
+
+		t/t0052.t	SourcePath
+		t/t0053.t	ConsPath
+		t/t0054.t	SplitPath
