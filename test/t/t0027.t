@@ -1,17 +1,16 @@
 #! /usr/bin/env perl
 #
-#	Compile an executable from a single .c file in the local
-#	directory.  The .c file includes on local .h file.  The .h
-#	file is ignored.  Use 'Depends' to establish a separate
-#	dependency on a completely unrelated file.  Invoke cons to
-#	build the executable.  Update the ignored local .h file
-#	and build again, checking that it the executable did not
-#	get re-built.  Update the unrelated file with the explicitly
-#	specified dependency and build again, checking that the
-#	executable now gets re-built with the updated .h file.
+#	Generate one file in the current directory and one file in a
+#	subdirectory, each by copying an input file, specified as a
+#	Command source file, and a separate dependency file, specified
+#	via Depends.  Both dependency files live in the subdirectory.
+#	Build both files; check that they build correctly.  Update both
+#	dependency files; check that both targets re-built correctly.
+#	Remove the top-level file's dependency file.  Re-build just the
+#	subdirectory file; check that it re-built correctly.
 #
 
-# $Id: t0027.t,v 1.3 2000/06/01 22:00:45 knight Exp $
+# $Id: t0027.t,v 1.6 2000/06/26 14:44:14 knight Exp $
 
 # Copyright (c) 1996-2000 Free Software Foundation, Inc.
 #
@@ -34,62 +33,94 @@ use Test::Cmd::Cons qw($_exe $_o);
 
 $test = Test::Cmd::Cons->new(string => 'Depends');
 
+$test->subdir('subdir');
+
 #
-$foo_exe = "foo$_exe";
+$subdir_foo_dep = $test->catfile('subdir', 'foo.dep');
+$subdir_bar_dep = $test->catfile('subdir', 'bar.dep');
 
 #
 $test->write('Construct', <<_EOF_);
 \$env = new cons ( ${\$test->cons_env} );
-Program \$env '$foo_exe', 'foo.c';
-Ignore '^foo.h';
-Depends \$env 'foo$_o', 'foo.dep';
+Export qw( env );
+Depends \$env 'foo', '$subdir_foo_dep';
+Command \$env 'foo', 'foo.in', qq(
+	\Q$^X\E -n -e "print" %< $subdir_foo_dep > %>
+);
+Build 'subdir/Conscript';
 _EOF_
 
-$test->write('foo.c', <<'_EOF_');
-#include "foo.h"
-int
-main(int argc, char *argv[])
-{
-	printf("%s\n", STRING);
-	exit (0);
-}
+$test->write('foo.in', <<'_EOF_');
+foo.in
 _EOF_
 
-$test->write('foo.dep', <<'_EOF_');
-xyzzy
+$test->write($subdir_foo_dep, <<'_EOF_');
+subdir/foo.dep 1
 _EOF_
 
-$test->write('foo.h', <<'_EOF_');
-#define	STRING	"SUCCESS!"
+$test->write(['subdir', 'Conscript'], <<_EOF_);
+Import qw( env );
+Depends \$env 'bar', 'bar.dep';
+Command \$env 'bar', 'bar.in', qq(
+	\Q$^X\E -n -e "print" %< $subdir_bar_dep > %>
+);
 _EOF_
 
-#
-$test->run(targets => ".");
-
-$test->execute(prog => 'foo', stdout => <<_EOF_);
-SUCCESS!
+$test->write(['subdir', 'bar.in'], <<'_EOF_');
+subdir/bar.in
 _EOF_
 
-$test->write('foo.h', <<'_EOF_');
-#define	STRING	"SUCCESS AGAIN!"
-_EOF_
-
-#
-$test->run(targets => ".");
-
-$test->execute(prog => 'foo', stdout => <<_EOF_);
-SUCCESS!
-_EOF_
-
-$test->write('foo.dep', <<'_EOF_');
-abracadabra
+$test->write($subdir_bar_dep, <<'_EOF_');
+subdir/bar.dep 1
 _EOF_
 
 #
 $test->run(targets => ".");
 
-$test->execute(prog => 'foo', stdout => <<_EOF_);
-SUCCESS AGAIN!
+$test->file_matches('foo', <<_EOF_);
+foo.in
+subdir/foo.dep 1
+_EOF_
+
+$test->file_matches(['subdir', 'bar'], <<_EOF_);
+subdir/bar.in
+subdir/bar.dep 1
+_EOF_
+
+#
+$test->write($subdir_foo_dep, <<'_EOF_');
+subdir/foo.dep 2
+_EOF_
+
+$test->write($subdir_bar_dep, <<'_EOF_');
+subdir/bar.dep 2
+_EOF_
+
+#
+$test->run(targets => ".");
+
+$test->file_matches('foo', <<_EOF_);
+foo.in
+subdir/foo.dep 2
+_EOF_
+
+$test->file_matches(['subdir', 'bar'], <<_EOF_);
+subdir/bar.in
+subdir/bar.dep 2
+_EOF_
+
+#
+$test->unlink($subdir_foo_dep);
+
+$test->write($subdir_bar_dep, <<'_EOF_');
+subdir/bar.dep 3
+_EOF_
+
+$test->run(targets => "subdir");
+
+$test->file_matches(['subdir', 'bar'], <<_EOF_);
+subdir/bar.in
+subdir/bar.dep 3
 _EOF_
 
 #

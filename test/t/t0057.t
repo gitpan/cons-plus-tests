@@ -6,7 +6,7 @@
 #	file.  Check that the output matches what we expect.
 #
 
-# $Id: t0057.t,v 1.3 2000/06/01 22:00:45 knight Exp $
+# $Id: t0057.t,v 1.4 2000/06/16 21:42:42 knight Exp $
 
 # Copyright (c) 1996-2000 Free Software Foundation, Inc.
 #
@@ -42,8 +42,8 @@ $test->write('Construct', <<_EOF_);
 \$env = new cons ( \%env_hash );
 Command \$env 'output', qw($foo_1 $foo_2 $foo_3), qq(
 	\Q$^X\E -e "print '%<', \\\\"\\\\n\\\\"" >> %>
-	\Q$^X\E -e "print '%[X_COMMA %< %]', \\\\"\\\\n\\\\"" >> %>
-	\Q$^X\E -e "print '%[X_HYPHEN %< %]', \\\\"\\\\n\\\\"" >> %>
+	\Q$^X\E -e "print '%[X_COMMA  %<  %]', \\\\"\\\\n\\\\"" >> %>
+	\Q$^X\E -e "print '%[X_HYPHEN  %<  %]', \\\\"\\\\n\\\\"" >> %>
 	\Q$^X\E -e "print '%[X_COMMA %< %] %[X_HYPHEN %< %]', \\\\"\\\\n\\\\"" >> %>
 );
 _EOF_

@@ -1,14 +1,46 @@
 Cons regression test suite changes
 
-$Id: CHANGES,v 1.2 2000/06/12 11:01:07 knight Exp $
+$Id: CHANGES,v 1.5 2000/06/26 16:56:57 knight Exp $
 
 
 
-Changes in cons release 2.x:
+Changes in cons release 2.1.1:
 
-	Write a real test for the following placeholder:
+	Made the cons-test.pl script itself work under Windows NT
+	(mainly avoiding fork() to spawn the tests).
+
+	Change flags in the WIN32 CCCOM environment variable from - to /
+	for Windows NT consistency.
+
+	Exported a new $_is_win32 variable from the Test::Cmd::Cons
+	module so system-dependent tests don't have to roll their own
+	check.  Updated the following tests to use it:
 		t/t0054.t		SplitPath
-	
+		t/t0064.t		Install failure
+
+	Added new test (currently disabled) for future use:
+		t/t0072.t		-Mstrict
+
+	Added new tests:
+		t/t0073.t		signature calculation
+		t/t0074.t		case-insensitivity
+
+	Modified existing tests for bug fixes:
+		t/t0027.t		Depends
+		t/t0054.t		SplitPath
+		t/t0057.t		%[ %] substitution
+		t/t0058.t		-t
+
+	Modified existing tests for new features:
+		t/t0034.t		-d
+		t/t0139.t		-d, -R
+
+
+
+Changes in cons release 2.0.1:
+
+	Wrote a real test for the following placeholder:
+		t/t0054.t		SplitPath
 
 
 

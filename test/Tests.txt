@@ -214,15 +214,14 @@ t/t0026.t		Ignore
 
 t/t0027.t		Depends
 
-	Compile an executable from a single .c file in the local
-	directory.  The .c file includes on local .h file.  The .h
-	file is ignored.  Use 'Depends' to establish a separate
-	dependency on a completely unrelated file.  Invoke cons to
-	build the executable.  Update the ignored local .h file
-	and build again, checking that it the executable did not
-	get re-built.  Update the unrelated file with the explicitly
-	specified dependency and build again, checking that the
-	executable now gets re-built with the updated .h file.
+	Generate one file in the current directory and one file in a
+	subdirectory, each by copying an input file, specified as a
+	Command source file, and a separate dependency file, specified
+	via Depends.  Both dependency files live in the subdirectory.
+	Build both files; check that they build correctly.  Update both
+	dependency files; check that both targets re-built correctly.
+	Remove the top-level file's dependency file.  Re-build just the
+	subdirectory file; check that it re-built correctly.
 
 t/t0028.t		-f dir/Construct
 
@@ -648,6 +647,38 @@ t/t0071.t		QuickScan
 	run Cons; look for proper output.  Update one of the other
 	included files; run Cons; look for proper output.  Update the
 	last included file; run Cons; look for proper output.
+
+t/t0072.t		-Mstrict
+
+	Compile a single executable from a single .c file in the
+	local directory.  After making sure it builds correctly,
+	re-run Cons with 'perl -Mstrict" and make sure we don't
+	get any errors or warnings.
+
+t/t0073.t		signature calculation
+
+	Create a supporting perl sript that reads another perl script,
+	strips comments, and evaluates it.  Create a build perl script
+	that intersperses print lines with comment lines each followed
+	by a single character from \000 to \255.  Use Cons to call the
+	build perl script to write its output to a file.  Check that we
+	saw every line we were supposed to.  Rewrite the build script
+	to append a single print statement.  Re-run Cons.  It should
+	re-generate the output file containing the last printed line;
+	check that it does.  (If not, some character value like ^Z caused
+	Cons to short-circuit its signature calcluation.)
+
+t/t0074.t		case-insensitivity
+
+	Build a file by copying an input file to output, along with
+	two separate dependency files.	Specify one Depends file using
+	an absolute path name with a lower-case initial letter (drive
+	letter on WIN32 systems).  Specify the other Depends file using an
+	initial upper-case letter.  Build the file.  Update the lower-case
+	Depends file and then try to re-build specifying an absolute path
+	with an initial upper-case letter.  Then update the upper-case
+	Depends file and re-build specifying an initial lower-case letter.
+	Check that the file is (re-)built properly after each run.
 
 t/t0101.t		Repository, no repository directory
 

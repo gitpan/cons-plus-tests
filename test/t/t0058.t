@@ -12,7 +12,7 @@
 #	it can't find the Construct file.
 #
 
-# $Id: t0058.t,v 1.5 2000/06/01 22:00:45 knight Exp $
+# $Id: t0058.t,v 1.6 2000/06/16 20:40:40 knight Exp $
 
 # Copyright (c) 1996-2000 Free Software Foundation, Inc.
 #
@@ -35,11 +35,13 @@ use Test::Cmd::Cons qw($_exe);
 
 $test = Test::Cmd::Cons->new(string => '-t');
 
-$test->subdir('subdir');
+$test->subdir('export', 'subdir');
 
 #
 $foo_exe = "foo$_exe";
 $bar_exe = "bar$_exe";
+$export_foo = $test->catfile('export', 'foo');
+$export_foo_exe = $test->catfile('export', $foo_exe);
 $subdir_Conscript = $test->catfile('subdir', 'Conscript');
 $subdir_bar = $test->catfile('subdir', 'bar');
 $subdir_bar_exe = $test->catfile('subdir', $bar_exe);
@@ -48,6 +50,7 @@ $subdir_bar_exe = $test->catfile('subdir', $bar_exe);
 $test->write("Construct", <<_EOF_);
 \$env = new cons ( ${\$test->cons_env} );
 Program \$env '$foo_exe', 'foo.c';
+Install \$env 'export', '$foo_exe';
 Build qw(
 	$subdir_Conscript
 );
@@ -79,10 +82,12 @@ _EOF_
 #
 $test->run('chdir' => 'subdir', targets => ".");
 $test->must_not_exist($foo_exe);
+$test->must_not_exist($export_foo_exe);
 $test->must_not_exist($subdir_bar_exe);
 
 $test->run('chdir' => 'subdir', flags => '-t', targets => ".");
 $test->must_not_exist($foo_exe);
+$test->must_not_exist($export_foo_exe);
 
 $test->execute(prog => $subdir_bar, stdout => <<_EOF_);
 subdir/bar.c
@@ -94,12 +99,25 @@ $test->execute(prog => 'foo', stdout => <<_EOF_);
 foo.c
 _EOF_
 
+$test->execute(prog => $export_foo, stdout => <<_EOF_);
+foo.c
+_EOF_
+
 $test->run('chdir' => 'subdir', flags => '-t -r', targets => ".");
 $test->must_exist($foo_exe);
+$test->must_exist($export_foo_exe);
 $test->must_not_exist($subdir_bar_exe);
 
 $test->run(flags => '-r', targets => ".");
 $test->must_not_exist($foo_exe);
+$test->must_not_exist($export_foo_exe);
+
+$test->run(flags => '-t', targets => "export");
+$test->must_not_exist($subdir_bar_exe);
+
+$test->execute(prog => $export_foo, stdout => <<_EOF_);
+foo.c
+_EOF_
 
 $test->unlink('Construct');
 

@@ -9,7 +9,7 @@
 #	the second file was properly installed in the second subdirectory.
 #
 
-# $Id: t0064.t,v 1.3 2000/06/01 22:00:45 knight Exp $
+# $Id: t0064.t,v 1.4 2000/06/19 22:07:36 knight Exp $
 
 # Copyright (c) 1996-2000 Free Software Foundation, Inc.
 #
@@ -28,7 +28,7 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-use Test::Cmd::Cons;
+use Test::Cmd::Cons qw($_is_win32);
 use Config;
 
 $test = Test::Cmd::Cons->new(string => 'Install failure');
@@ -78,15 +78,7 @@ $test->writable($install_subdir1, 0);
 my $ret = open(INSTALLED, $install_subdir1_foo1_pl);
 $test->no_result(! $ret);
 
-my $iswin32;
-if ($] <  5.003) {
-    eval("require Win32");
-    $iswin32 = ! $@;
-} else {
-    $iswin32 = $^O eq "MSWin32";
-}
-
-if ($iswin32) {
+if ($_is_win32) {
     $fail = '$? != 0';
     $stderr = <<_EOF_;
 \Q${\$test->basename}: can't install "$src_foo1_pl" to "$install_subdir1_foo1_pl" (Permission denied)\E

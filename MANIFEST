@@ -9,7 +9,10 @@ cons
 cons.1
 cons.bat
 cons.html
-test.5.00503.log
+test.5.00307.log
+test.5.00405.log
+test.5.00556.log
+test.5.6.0.log
 test/cons-test.pl
 test/CHANGES
 test/README
@@ -88,6 +91,9 @@ test/t/t0068.t
 test/t/t0069.t
 test/t/t0070.t
 test/t/t0071.t
+test/t/t0072.t
+test/t/t0073.t
+test/t/t0074.t
 test/t/t0101.t
 test/t/t0102.t
 test/t/t0103.t

@@ -9,7 +9,7 @@
 #	NOTE:  THIS TEST EXAMINES THE ACTIONS USED TO BUILD FILES.
 #
 
-# $Id: t0139.t,v 1.5 2000/06/01 22:00:50 knight Exp $
+# $Id: t0139.t,v 1.7 2000/06/19 20:13:42 knight Exp $
 
 # Copyright (c) 1996-2000 Free Software Foundation, Inc.
 #
@@ -111,28 +111,36 @@ Target \Q$aaa_exe\E: \Q$aaa_o\E
 Checking \Q$aaa_exe\E
   Checking \Q$aaa_o\E
     Checking \Qaaa.c\E
-$CC .* \Q$aaa_o\E\\b.*
+  Rebuilding \Q$aaa_o\E: out of date.
+$CC .*\Q$aaa_o\E\\b.*
+Rebuilding \Q$aaa_exe\E: out of date.
 $LINK .*aaa\\b.*
 Target \Q$aaa_o\E: \Qaaa.c\E
 Target \Q$bbb_exe\E: \Q$bbb_o\E
 Checking \Q$bbb_exe\E
   Checking \Q$bbb_o\E
     Checking \Qbbb.c\E
-$CC .* \Q$bbb_o\E\\b.*
+  Rebuilding \Q$bbb_o\E: out of date.
+$CC .*\Q$bbb_o\E\\b.*
+Rebuilding \Q$bbb_exe\E: out of date.
 $LINK .*bbb\\b.*
 Target \Q$bbb_o\E: \Qbbb.c\E
 Target \Q$subdir_ccc_exe\E: \Q$subdir_ccc_o\E
 Checking \Q$subdir_ccc_exe\E
   Checking \Q$subdir_ccc_o\E
     Checking \Q$subdir_ccc_c\E
-$CC .* \Q$subdir_ccc_o\E\\b.*
-$LINK .* \Q$subdir_ccc\E\\b.*
+  Rebuilding \Q$subdir_ccc_o\E: out of date.
+$CC .*\Q$subdir_ccc_o\E\\b.*
+Rebuilding \Q$subdir_ccc_exe\E: out of date.
+$LINK .*\Q$subdir_ccc\E\\b.*
 Target \Q$subdir_ccc_o\E: \Q$subdir_ccc_c\E
 Target \Q$subdir_ddd_exe\E: \Q$subdir_ddd_o\E
 Checking \Q$subdir_ddd_exe\E
   Checking \Q$subdir_ddd_o\E
     Checking \Q$subdir_ddd_c\E
+  Rebuilding \Q$subdir_ddd_o\E: out of date.
 $CC .*\Q$subdir_ddd_o\E\\b.*
+Rebuilding \Q$subdir_ddd_exe\E: out of date.
 $LINK .*\Q$subdir_ddd\E\\b.*
 Target \Q$subdir_ddd_o\E: \Q$subdir_ddd_c\E
 _EOF_

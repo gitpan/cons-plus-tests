@@ -1,11 +1,11 @@
 #! /usr/bin/env perl
 #
-# cons-test [-x cons] [test_script ...]
+# cons-test
 #
 #	Run the cons regression test suite.
 #
 
-# $Id: cons-test.pl,v 1.6 2000/06/01 22:02:39 knight Exp $
+# $Id: cons-test.pl,v 1.8 2000/06/27 02:50:50 knight Exp $
 
 # Copyright (c) 1996-2000 Free Software Foundation, Inc.
 #
@@ -79,6 +79,13 @@ if (defined($opt_x)) {
     print "Using the '$Cons' script.\n" unless $opt_q;
 }
 
+if ($] <  5.003) {
+    eval("require Win32");
+    $use_waitpid = $@;
+} else {
+    $use_waitpid = $^O ne "MSWin32";
+}
+
 $ENV{CONS} = $Cons;
 
 my $pass = 0;
@@ -98,7 +105,7 @@ my $child_pid;
 
 sub handler {
     my($sig) = @_;
-    waitpid($child_pid, 0);
+    waitpid($child_pid, 0) if $use_waitpid;
     print "$My_Name:  Caught SIG$sig; exiting.\n";
     print "\n";
     &report(' so far');
@@ -149,17 +156,20 @@ while (@ARGV) {
     my ($name, $path, $suffix) = fileparse($test, keys %suffix_map);
     my($cmd) = "$suffix_map{$suffix} $prefix$test";
     print "$My_Name:  $cmd\n";
-    $child_pid = fork;
-    if ($child_pid == 0) {
-	exec $cmd;
+    $child_pid = open(PIPE, "|$cmd");
+    if (! defined($child_pid)) {
+	print "Unable to start '$cmd': $!\n";
+	&report(' so far');
+	exit (1);
     }
-    waitpid($child_pid, 0);
+    waitpid($child_pid, 0) if $use_waitpid;
     $exit = $?;
     if ($exit) {
 	push(@fail, $test);
     } else {
 	$pass++;
     }
+    close(PIPE);
 }
 
 print "\n";

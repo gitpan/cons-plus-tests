@@ -7,7 +7,7 @@
 #	path to a subdirectory within the tree.  Check the output file.
 #
 
-# $Id: t0054.t,v 1.4 2000/06/12 11:01:07 knight Exp $
+# $Id: t0054.t,v 1.5 2000/06/19 22:02:00 knight Exp $
 
 # Copyright (c) 1996-2000 Free Software Foundation, Inc.
 #
@@ -26,7 +26,7 @@
 # the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 # Boston, MA 02111-1307, USA.
 
-use Test::Cmd::Cons;
+use Test::Cmd::Cons qw($_is_win32);
 use Config;
 
 $test = Test::Cmd::Cons->new(string => 'SplitPath');
@@ -39,21 +39,28 @@ $workpath_foo = $test->workpath('foo');
 $workpath_subdir_bar = $test->workpath('subdir', 'bar');
 
 #
+$SEP = $_is_win32 ? ';' : ':';
+
+#
 $test->write(['subdir', 'Construct'], <<_EOF_);
 \$env = new cons ( ${\$test->cons_env} );
 Export qw( env );
-\@sp_1 = SplitPath ".";
-\@sp_2 = SplitPath "xxx";
-\@sp_3 = SplitPath "$workpath_foo";
-\@sp_4 = SplitPath "$workpath_subdir_bar";
-\@sp_5 = SplitPath "$sub_dir:.:yyy:$workpath_foo:$workpath_subdir_bar";
+\$sp_1 = join(' ', SplitPath ".");
+\$sp_2 = join(' ', SplitPath "xxx");
+\$sp_3 = join(' ', SplitPath "\Q$workpath_foo\E");
+\$sp_4 = join(' ', SplitPath "\Q$workpath_subdir_bar\E");
+\$sp_5 = join(' ', SplitPath [ "\Q$sub_dir\E", ".", "yyy",
+				"\Q$workpath_foo\E",
+				"\Q$workpath_subdir_bar\E" ]);
+\$sp_6 = join(' ', SplitPath "\Q$sub_dir\E${SEP}.${SEP}yyy${SEP}\Q$workpath_foo\E${SEP}\Q$workpath_subdir_bar\E");
 Command \$env 'aaa.out', 'aaa.pl', qq(
 	\Q$^X\E %< > %>
-	\Q$^X\E -e "print 'sp_1 = \@sp_1', \\\\"\\\\n\\\\"" >> %>
-	\Q$^X\E -e "print 'sp_2 = \@sp_2', \\\\"\\\\n\\\\"" >> %>
-	\Q$^X\E -e "print 'sp_3 = \@sp_3', \\\\"\\\\n\\\\"" >> %>
-	\Q$^X\E -e "print 'sp_4 = \@sp_4', \\\\"\\\\n\\\\"" >> %>
-	\Q$^X\E -e "print 'sp_5 = \@sp_5', \\\\"\\\\n\\\\"" >> %>
+	\Q$^X\E -e "print 'sp_1 = \$sp_1', \\\\"\\\\n\\\\"" >> %>
+	\Q$^X\E -e "print 'sp_2 = \$sp_2', \\\\"\\\\n\\\\"" >> %>
+	\Q$^X\E -e "print 'sp_3 = \$sp_3', \\\\"\\\\n\\\\"" >> %>
+	\Q$^X\E -e "print 'sp_4 = \$sp_4', \\\\"\\\\n\\\\"" >> %>
+	\Q$^X\E -e "print 'sp_5 = \$sp_5', \\\\"\\\\n\\\\"" >> %>
+	\Q$^X\E -e "print 'sp_6 = \$sp_6', \\\\"\\\\n\\\\"" >> %>
 );
 _EOF_
 
@@ -67,11 +74,12 @@ $test->run('chdir' => 'subdir', targets => "."); # expect failure
 
 $test->file_matches(['subdir', 'aaa.out'], <<_EOF_);
 \Qaaa.pl\E
-\Qsp_1 = .\E
-\Qsp_2 = xxx\E
-\Qsp_3 = $workpath_foo\E
-\Qsp_4 = bar\E
-\Qsp_5 = $sub_dir . yyy $workpath_foo bar\E
+sp_1 = \Q.\E
+sp_2 = xxx
+sp_3 = \Q$workpath_foo\E
+sp_4 = bar
+sp_5 = \Q$sub_dir\E . yyy \Q$workpath_foo bar\E
+sp_6 = \Q$sub_dir\E . yyy \Q$workpath_foo bar\E
 _EOF_
 
 #

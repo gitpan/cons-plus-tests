@@ -1,5 +1,5 @@
 Cons regression tests to-do list
-$Id: TODO,v 1.2 2000/06/12 11:01:07 knight Exp $
+$Id: TODO,v 1.5 2000/06/19 20:14:26 knight Exp $
 
 Things that it would be good to have fixed, some day:
 
@@ -14,3 +14,7 @@ Things that it would be good to have fixed, some day:
 
 		t/t0052.t	SourcePath
 		t/t0053.t	ConsPath
+
+    --	Tests that don't work on WIN32:
+
+		t/t0054.t		\ separators in WIN32 path names

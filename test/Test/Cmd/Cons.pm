@@ -1,4 +1,4 @@
-# $Id: Cons.pm,v 1.6 2000/06/06 20:27:02 knight Exp $
+# $Id: Cons.pm,v 1.9 2000/06/19 22:01:30 knight Exp $
 
 # This module should be included in every Cons test.
 # Run "perldoc Test::Cmd::Cons" to get at the documentation
@@ -24,13 +24,13 @@
 package Test::Cmd::Cons;
 
 use strict;
-use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $_exe $_o $_a);
+use vars qw($VERSION @ISA @EXPORT @EXPORT_OK $_exe $_o $_a $_is_win32);
 use Exporter ();
 
-$VERSION = '0.01';
+$VERSION = '2.1';
 @ISA = qw(Test::Cmd Exporter);
 
-@EXPORT_OK = qw($_exe $_o $_a);
+@EXPORT_OK = qw($_exe $_o $_a $_is_win32);
 
 use Config;
 use Cwd;
@@ -97,7 +97,7 @@ Test::Cmd::Cons - module for testing the Cons software construction utility
 
   $test->unlink('file', ...);
 
-  use Test::Cmd::Cons qw($_exe $_o $_a);
+  use Test::Cmd::Cons qw($_exe $_o $_a $_is_win32);
 
 =head1 DESCRIPTION
 
@@ -108,13 +108,15 @@ All methods throw exceptions and exit on failure.  This makes it
 unnecessary to add explicit checks for return values, making the test
 scripts themselves simpler to write and easier to read.
 
-The C<Test::Cmd::Cons> module provides three importable variables:
-C<$_exe>, C<$_o>, and C<$_a>.  These are respectively, the values
-normally available from C<$Config{_exe}> (executable file suffix),
-C<$Config{_o}> (object file suffix) and C<$Config{_a}> (library suffix).
-These C<$Config> values, however, are not available prior to Perl 5.005,
-so the C<Test::Cmd::Cons> module figures out proper values via other
-means, if necessary.
+The C<Test::Cmd::Cons> module provides some importable variables:
+C<$_exe>, C<$_o>, C<$_a>, C<$_is_win32>.  The first three are respectively,
+the values normally available from C<$Config{_exe}> (executable file
+suffix), C<$Config{_o}> (object file suffix) and C<$Config{_a}> (library
+suffix).  These C<$Config> values, however, are not available prior to
+Perl 5.005, so the C<Test::Cmd::Cons> module figures out proper values
+via other means, if necessary.  The C<$_is_win32> variable provides
+a Perl-version-independent means of testing for whether the current
+platform is a Win32 system.
 
 =head1 METHODS
 
@@ -122,21 +124,19 @@ means, if necessary.
 
 =cut
 
-my $iswin32;
-
 BEGIN {
     if ($] <  5.003) {
 	eval("require Win32");
-	$iswin32 = ! $@;
+	$_is_win32 = ! $@;
     } else {
-	$iswin32 = $^O eq "MSWin32";
+	$_is_win32 = $^O eq "MSWin32";
     }
 
     $Cons = $ENV{CONS} || 'cons';
 
     $Cons_Env = $ENV{CONSENV};
     if (! $Cons_Env) {
-	if ($iswin32) {
+	if ($_is_win32) {
 		# Ordinarily, we want to use the default
 		# CC, LINK and PREFLIB values in Cons itself.
 		# Unfortunately, some of the tests use the
@@ -153,7 +153,7 @@ BEGIN {
 			# The extra file name print messes up the
 			# output we examine to see if Cons did the
 			# right thing in certain circumstances.
-			CCCOM	=> '%CC %CFLAGS %_IFLAGS -c %< -Fo%> %CCOUTPUT',
+			CCCOM	=> '%CC %CFLAGS %_IFLAGS /c %< /Fo%> %CCOUTPUT',
 			LINK => 'link',
 			# Use the magic, undocumented %_LIBS symbol
 			# so specifying libraries via -lfoo works
@@ -183,13 +183,13 @@ BEGIN {
     }
     $_exe = $Config{_exe};
     $_exe = $Config{exe_ext} if ! defined $_exe;
-    $_exe = $iswin32 ? '.exe' : '' if ! defined $_exe;
+    $_exe = $_is_win32 ? '.exe' : '' if ! defined $_exe;
     $_o = $Config{_o};
     $_o = $Config{obj_ext}  if ! defined $_o;
-    $_o = $iswin32 ? '.obj' : '.o' if ! defined $_o;
+    $_o = $_is_win32 ? '.obj' : '.o' if ! defined $_o;
     $_a = $Config{_a};
     $_a = $Config{lib_ext} if ! defined $_a;
-    $_a = $iswin32 ? '.lib' : '.a' if ! defined $_a;
+    $_a = $_is_win32 ? '.lib' : '.a' if ! defined $_a;
 }
 
 
@@ -222,7 +222,7 @@ sub new {
     my $class = ref($proto) || $proto;
     my $cwd = Cwd::cwd();
     my $test = $class->SUPER::new('prog' => $Cons,
-				'interpreter' => "$^X -I$cwd",
+				'interpreter' => "$^X -I. -I$cwd",
 				'workdir' => '',
 				@_);
     $class->SUPER::no_result(! $test, undef, 1);
